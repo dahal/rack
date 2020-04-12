@@ -231,9 +231,11 @@ module Rack
 
     def parse_cookies_from_header
       cookies = Hash.new
-      if original_headers.has_key? 'Set-Cookie'
-        set_cookie_header = original_headers.fetch('Set-Cookie')
-        set_cookie_header.split("\n").each do |cookie|
+      hashed_headers = Rack::Utils::HeaderHash[original_headers]
+      if hashed_headers.has_key?("Set-Cookie")
+        values = (v = hashed_headers["Set-Cookie"]).respond_to?(:to_ary) ? v.to_ary : v.split("\n")
+
+        values.each do |cookie|
           cookie_name, cookie_filling = cookie.split('=', 2)
           cookie_attributes = identify_cookie_attributes cookie_filling
           parsed_cookie = CGI::Cookie.new(
@@ -246,7 +248,7 @@ module Rack
           )
           cookies.store(cookie_name, parsed_cookie)
         end
-      end
+		  end
       cookies
     end
 
