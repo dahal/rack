@@ -422,7 +422,7 @@ module Rack
       def initialize(hash = {})
         super()
         @names = {}
-        hash.each { |k, v| self[k] = v }
+        (hash || {}).each { |k, v| self[k] = v }
       end
 
       # on dup/clone, we need to duplicate @names hash
